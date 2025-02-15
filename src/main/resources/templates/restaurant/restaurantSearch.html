@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/star-rating.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>FoodForum</title>
+</head>
+<body>
+
+<!-- Include the header -->
+<div th:replace="fragments :: header"></div>
+
+<!-- 상위 컨테이너로 중앙 정렬 -->
+<div class="d-flex vh-100 justify-content-center align-items-center">
+    <div class="w-75"> <!-- 내부 컨테이너로 테이블과 페이지네이션을 감쌈 -->
+
+        <div th:if="${restaurantPage.isEmpty()}" class="text-center">
+            <h2>
+                <span th:text="${restaurantName}" class="text-info"></span>
+                <span> 에 대한 검색결과가 없습니다.</span>
+            </h2>
+            <p>다른 검색어로 검색해주세요</p>
+        </div>
+
+        <div th:if="!${restaurantPage.isEmpty()}">
+
+            <div class="row my-3">
+                <div class="col-1 gx-1 ms-3">
+                    <a th:href="@{/restaurants/search(restaurantName=${restaurantName}, page=0, orderField='totalRating')}"
+                       class="text-decoration-none" style="color: #FF6600;"
+                       th:classappend="${orderField == 'totalRating' ? 'fw-bold' : ''}">별점 순</a>
+                </div>
+                <div class="col-2 gx-1">
+                    <a th:href="@{/restaurants/search(restaurantName=${restaurantName}, page=0, orderField='reviewCount')}"
+                       class="text-decoration-none" style="color: #FF6600;"
+                       th:classappend="${orderField == 'reviewCount' ? 'fw-bold' : ''}">리뷰 많은 순</a>
+                </div>
+            </div>
+
+
+
+            <table border="1" class="table table-striped">
+                <thead>
+                <tr>
+                    <th class="col-2">식당 이름</th>
+                    <th class="col-1">별점</th>
+                    <th class="col-5">소개</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="restaurant : ${restaurantPage.content}"
+                    th:data-total-rating="${restaurant.totalRating}">
+                    <!-- 레스토랑 이름을 클릭할 수 있게 설정 -->
+                    <td>
+                        <a th:href="@{/restaurants/{id}(id=${restaurant.id})}" th:text="${restaurant.name}"></a>
+                    </td>
+                    <!-- 별점 -->
+                    <td>
+                        <span class="star-rating" th:if="${restaurant.totalRating >= 5}">★★★★★</span>
+                        <span class="star-rating" th:if="${restaurant.totalRating >= 4 && restaurant.totalRating < 5}">★★★★☆</span>
+                        <span class="star-rating" th:if="${restaurant.totalRating >= 3 && restaurant.totalRating < 4}">★★★☆☆</span>
+                        <span class="star-rating" th:if="${restaurant.totalRating >= 2 && restaurant.totalRating < 3}">★★☆☆☆</span>
+                        <span class="star-rating" th:if="${restaurant.totalRating >= 1 && restaurant.totalRating < 2}">★☆☆☆☆</span>
+                        <span class="star-rating" th:if="${restaurant.totalRating < 1}">☆☆☆☆☆</span>
+                    </td>
+
+                    <!-- 소개 -->
+                    <td th:text="${restaurant.description}" class="text-truncate" style="max-width: 150px;"></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <nav aria-label="Page navigation example" class="d-flex justify-content-center mt-3">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${restaurantPage.isFirst()} ? 'disabled'">
+                        <a class="page-link" href="#"
+                           th:onclick="${startPage != 0} ? |location.href='@{/restaurants/search(restaurantName=${restaurantName}, page=${startPage-1}, orderField=${orderField})}'| : |location.href='@{/restaurants/search(restaurantName=${restaurantName}, page=${startPage}, orderField=${orderField})}'|">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:classappend="${i == restaurantPage.number} ? 'active' : ''">
+                        <a class="page-link" th:href="@{/restaurants/search(restaurantName=${restaurantName}, page=${i}, orderField=${orderField})}" th:text="${i + 1}"></a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${restaurantPage.isLast()} ? 'disabled'">
+                        <a class="page-link" href="#"
+                           th:onclick="${endPage != (restaurantPage.getTotalPages() - 1)} ? |location.href='@{/restaurants/search(restaurantName=${restaurantName}, page=${endPage+1}, orderField=${orderField})}'| : |location.href='@{/restaurants/search(restaurantName=${restaurantName}, page=${endPage}, orderField=${orderField})}'|">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>

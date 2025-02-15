@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <title>FoodForum</title>
+</head>
+<body>
+
+<form id="restaurant-signup-form">
+
+    <input type="hidden" id="restaurantId" th:value="${restaurantId}">
+
+    <label for="restaurantName">restaurantName:</label>
+    <input type="text" id="restaurantName" name="restaurantName" required><br>
+
+    <div id="menu-list">
+        <!-- 동적으로 추가될 메뉴 입력 필드가 여기에 추가됨 -->
+    </div>
+
+    <button type="button" onclick="addMenuField()">메뉴 추가</button>
+    <button type="submit">Restaurant Create</button>
+</form>
+
+<script>
+        $(document).ready(function() {
+            $('#restaurant-signup-form').on('submit', function(event) {
+                event.preventDefault(); // 기본 제출 방지
+
+                const formData = {
+                    menus: []
+                };
+
+                // 메뉴 항목을 배열에 추가
+                $('.menu-item').each(function(index) {
+                    const menuName = $(this).find('input[name^="menus"]').eq(0).val(); // 메뉴 이름
+                    const menuPrice = $(this).find('input[name^="menus"]').eq(1).val(); // 메뉴 가격
+                    formData.menus.push({ name: menuName, price: menuPrice }); // 객체 추가
+                });
+
+                $.ajax({
+                    url: '/api/restaurant/new',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        alert(response);
+                        window.location.href = '/';
+                    },
+                    error: function(xhr, status, error) {
+                        alert(xhr.responseText);
+                    }
+                });
+            });
+        });
+
+        // 메뉴 항목 추가 함수
+        function addMenuField() {
+            // 메뉴 리스트를 담고 있는 div를 찾음
+            const menuListDiv = document.getElementById('menu-list');
+
+            // 새로운 메뉴 입력 필드 div 생성
+            const newMenuDiv = document.createElement('div');
+            newMenuDiv.className = 'menu-item';
+
+            // 메뉴 이름 입력 필드 생성
+            const menuNameInput = document.createElement('input');
+            menuNameInput.type = 'text';
+            menuNameInput.name = `menus[${menuListDiv.children.length}].name`;
+            menuNameInput.placeholder = '메뉴 이름';
+
+            // 메뉴 가격 입력 필드 생성
+            const menuPriceInput = document.createElement('input');
+            menuPriceInput.type = 'text';
+            menuPriceInput.name = `menus[${menuListDiv.children.length}].price`;
+            menuPriceInput.placeholder = '메뉴 가격';
+
+            // 새로운 메뉴 입력 필드를 메뉴 리스트 div에 추가
+            newMenuDiv.appendChild(menuNameInput);
+            newMenuDiv.appendChild(menuPriceInput);
+            menuListDiv.appendChild(newMenuDiv);
+        }
+    </script>
+</body>
+</html>

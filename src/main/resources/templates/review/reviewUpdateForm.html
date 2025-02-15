@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
+  <title>FoodForum</title>
+</head>
+<body>
+
+<input type="hidden" id="reviewId" th:value="${reviewId}">
+
+<div class="d-flex vh-100 justify-content-center align-items-center">
+  <div class="mb-3 border rounded shadow w-75 text-center">
+
+    <form class="w-75 mx-auto" id="review-update-form">
+
+      <p class="h2 mt-5">Food Forum</p>
+      <p class="lead my-3">리뷰 수정</p>
+
+      <div class="form-floating mb-3">
+        <textarea class="form-control" placeholder="Leave a comment here" name="content" id="content" maxlength="200"
+                  oninput="updateCharacterCount()" th:text="${existingReview}" style="height: 200px" required></textarea>
+        <label class="text-muted text-sm" for="content">리뷰작성은 최대 200자 까지 가능합니다</label>
+
+        <div class="text-end">
+          <small id="charCount">0/200</small>
+        </div>
+      </div>
+
+      <div class="form-floating mb-3">
+        <select class="form-select" id="starRating" aria-label="Floating label select example">
+          <option value="0" th:selected="${existingRating == 0}">0점</option>
+          <option value="1" th:selected="${existingRating == 1}">1점</option>
+          <option value="2" th:selected="${existingRating == 2}">2점</option>
+          <option value="3" th:selected="${existingRating == 3}">3점</option>
+          <option value="4" th:selected="${existingRating == 4}">4점</option>
+          <option value="5" th:selected="${existingRating == 5}">5점</option>
+        </select>
+        <label for="starRating">별점을 선택해주세요</label>
+      </div>
+
+      <div class="mb-3">
+        <button class="btn btn-outline-primary me-2" type="submit">수정 완료</button>
+        <button class="btn btn-outline-primary" onclick="history.back()">돌아가기</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+
+        const csrfToken = $("meta[name='_csrf']").attr("content");
+        const csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+        function updateCharacterCount() {
+            const content = document.getElementById("content");
+            const charCount = document.getElementById("charCount");
+            const currentLength = content.value.length;
+            const maxLength = content.getAttribute("maxlength");
+
+            // 글자 수 표시 업데이트
+            charCount.textContent = `${currentLength}/${maxLength}`;
+        }
+
+        $(document).ready(function() {
+            $('#review-update-form').on('submit', function(event) {
+                event.preventDefault();  // 폼 기본 제출 방지
+                var starRating = $('#starRating').val();
+                const reviewId = $('#reviewId').val();
+
+                // 폼 데이터 가져오기
+                const formData = {
+                    content: $('#content').val(),
+                    starRating: parseFloat(starRating)
+                };
+
+                $.ajax({
+                    url: '/api/reviews/' + reviewId + '/update',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
+                    },
+                    success: function(response) {
+                        // 팝업창 띄우기
+                        alert(response);
+
+                        window.location.href = '/reviews';
+                    },
+                    error: function(xhr, status, error) {
+                        alert(xhr.responseText);
+                        window.location.href = '/reviews';
+                    }
+                });
+            });
+        });
+
+        window.onload = function() {
+            updateCharacterCount();
+        }
+    </script>
+</body>
+</html>

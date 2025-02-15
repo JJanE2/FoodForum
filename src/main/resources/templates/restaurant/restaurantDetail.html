@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/star-rating.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>FoodForum</title>
+</head>
+<body>
+
+
+<!-- Include the header -->
+<div th:replace="fragments :: header"></div>
+
+<div class="d-flex vh-100 justify-content-center mt-5">
+    <div class="w-75 mt-5">
+        <div class="container rounded border shadow align-items-center py-3 mb-5">
+            <div id="restaurantInfo">
+                <!-- 레스토랑 정보가 여기에 표시될 예정 -->
+            </div>
+
+            <h3>메뉴</h3><hr>
+
+            <div id="menuInfo">
+                <!-- 메뉴 데이터가 여기에 표시될 예정 -->
+            </div>
+        </div>
+
+        <div id="reviewInfo">
+            <div class="text-center">
+                <button class="btn btn-outline-primary" th:onclick="|location.href='@{/{restaurantId}/review/new(restaurantId=${restaurantId})}'|">리뷰 작성</button><br>
+            </div>
+            <!-- 리뷰 데이터가 여기에 표시될 예정 -->
+        </div>
+    </div>
+</div>
+
+<div id="loading" style="display:none;">로딩 중...</div> <!-- 로딩 표시 추가 -->
+
+<script type="text/javascript">
+    // Thymeleaf에서 전달된 restaurantId를 JS 변수로 할당
+    var id = [[${restaurantId}]];  // 이 부분은 Thymeleaf에서 restaurantId를 전달받음.
+
+    let cursorId = null; // 첫 요청 시 커서 ID 없음
+    let isLoading = false; // 로딩 중 여부 체크
+    let isLoadingReviews = false;
+    let isNoMoreReviews = false;
+
+    // 레스토랑 정보와 메뉴를 불러오는 함수
+    function loadRestInfo() {
+        if (isLoading) return; // 이미 로딩 중이면 중단
+        isLoading = true;
+        $('#loading').show(); // 로딩 표시
+
+        $.ajax({
+            url: "/api/restaurant/" + id,  // 동적으로 URL을 생성
+            method: 'GET',
+            data: {
+                cursorId: cursorId,
+                pageSize: 10
+            },
+            success: function(response) {
+                var restaurantInfo = $('#restaurantInfo');
+                const totalRating = response.starRating; // 총 별점 가져오기
+                        let stars = '';
+
+                        // 별점에 따른 별 표시 생성
+                        for (let i = 0; i < 5; i++) {
+                            if (totalRating >= i + 1) {
+                                stars += '★'; // 전체 별
+                            } else if (totalRating >= i + 0.5) {
+                                stars += '☆'; // 반 별
+                            } else {
+                                stars += '☆'; // 빈 별
+                            }
+                        }
+
+                let infoData = `
+                    <div class="row justify-content-start py-2">
+                        <div class="col-12">
+                            <h2>${response.name}</h2>
+                        </div>
+                    </div>
+                    <div class="row justify-content-start mb-3">
+                        <div class="col-2">
+                            <span class="star-rating">${stars}</span>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row justify-content-start mt-1 mb-3">
+                        <div class="col-12">
+                            <p class="text-break">${response.description}</p>
+                        </div>
+                    </div>`;
+                    restaurantInfo.html(infoData);
+
+
+                // 메뉴 정보를 추가할 변수
+                var menuInfo = $('#menuInfo');
+                menuInfo.empty(); // 메뉴 정보를 초기화
+
+                if (response.menus.length > 0) {
+                    // 메뉴를 반복하여 menuHtml에 추가
+                    response.menus.forEach(function(menu) {
+                        let menuHtml = `
+                            <div>
+                                <p>${menu.name} - ${menu.price} 원</p>
+                            </div>`;
+                        menuInfo.append(menuHtml);
+                    });
+                } else {
+                    // 메뉴가 없을 경우 대체 메시지 출력
+                    menuInfo.append(`
+                        <div>
+                            <p class="text-center text-secondary">등록된 메뉴가 없습니다</p>
+                        </div>`);
+                }
+
+                isLoading = false; // 로딩 상태 업데이트
+                $('#loading').hide(); // 로딩 표시 숨기기
+            },
+            error: function(xhr, status, error) {
+                console.error('레스토랑 정보 로드 실패:', error);
+                isLoading = false;
+                $('#loading').hide(); // 로딩 표시 숨기기
+            }
+        });
+    }
+
+    // 리뷰 데이터를 불러오는 함수
+    function loadMoreReviews() {
+        if (isLoadingReviews || isNoMoreReviews) return;
+        isLoadingReviews = true;
+        $('#loading').show(); // 로딩 표시
+
+        $.ajax({
+            url: "/api/restaurant/" + id + '/reviews',  // 리뷰 URL을 생성
+            method: 'GET',
+            data: {
+                cursorId: cursorId,
+                pageSize: 10 // 가져올 리뷰 개수
+            },
+            success: function(response) {
+                // 리뷰 목록을 표시할 HTML 요소를 찾음
+                var reviewInfo = $('#reviewInfo');
+
+                if (response.length > 0) {
+
+                    response.forEach(function(review) {
+
+                        const reviewRating = review.starRating;
+                        let reviewStars = '';
+
+                        for (let i = 0; i < 5; i++) {
+                            if (reviewRating >= i + 1) {
+                                reviewStars += '★'; // 전체 별
+                            } else if (reviewRating >= i + 0.5) {
+                                reviewStars += '☆'; // 반 별
+                            } else {
+                                reviewStars += '☆'; // 빈 별
+                            }
+                        }
+
+                        const date = new Date(review.date);
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const formattedDate = `${year}/${month}/${day}`;
+
+                        let reviewHtml = `
+                            <div class="rounded border shadow container align-items-center mt-5">
+                                <div class="row justify-content-between py-3">
+                                    <div class="col-4">
+                                        ${review.memberNickname}
+                                    </div>
+                                    <div class="text-end col-2">
+                                        ${formattedDate}
+                                    </div>
+                                </div>
+
+                                <div class="row justify-content-start mb-2">
+                                    <div class="col-2">
+                                        <span class="star-rating">${reviewStars}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row justify-content-start mb-2">
+                                    <p class="text-break">${review.content}</p>
+                                </div>
+                            </div>`;
+                        reviewInfo.append(reviewHtml);
+                    });
+                } else {
+                    isNoMoreReviews = true;
+
+                    reviewInfo.append(`
+                        <div class="my-3">
+                            <p class="text-center text-secondary">리뷰가 없습니다</p>
+                        </div>
+                    `);
+                }
+
+                // 마지막 리뷰의 ID를 새로운 커서로 설정
+                if (response.length > 0) {
+                    cursorId = response[response.length - 1].id;
+                }
+
+                isLoadingReviews = false; // 로딩 상태 업데이트
+                $('#loading').hide(); // 로딩 표시 숨기기
+            },
+            error: function(xhr, status, error) {
+                console.error('리뷰 로드 실패:', error);
+                isLoadingReviews = false;
+                $('#loading').hide(); // 로딩 표시 숨기기
+            }
+        });
+    }
+
+    $(window).on('scroll', function() {
+        // 페이지의 끝에 도달했을 때 추가 데이터를 로드
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+            loadMoreReviews();
+        }
+    });
+
+    // 페이지 로드 시 레스토랑 정보와 메뉴를 불러오기
+    $(document).ready(function() {
+        loadRestInfo();
+        loadMoreReviews();
+    });
+</script>
+
+</body>
+</html>

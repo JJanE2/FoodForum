@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/star-rating.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>FoodForum</title>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+
+<!-- Include the header -->
+<div th:replace="fragments :: header"></div>
+
+<!-- 상위 컨테이너로 중앙 정렬 -->
+<div class="d-flex vh-100 justify-content-center align-items-center">
+    <div class="w-75"> <!-- 내부 컨테이너로 테이블과 페이지네이션을 감쌈 -->
+
+        <div class="text-start my-2">
+            <h2>관리자 페이지</h2>
+            <p class="text-muted">전체 리뷰를 검색(닉네임/내용) 및 관리할 수 있습니다.</p>
+        </div>
+
+        <form class="row my-3 mx-auto g-1" role="search" th:action="@{/admin/reviews(searchCond=${searchCond}, keyword=${keyword})}" method="get">
+            <div class="col-2">
+                <select class="form-select" name="searchCond">
+                    <option value="nickname" th:selected="${searchCond == 'nickname'}">닉네임</option>
+                    <option value="content" th:selected="${searchCond == 'content'}">내용</option>
+                </select>
+            </div>
+
+            <div class="col-8">
+                <input class="form-control" type="search" placeholder="검색어를 입력하세요" aria-label="Search" id="keyword" name="keyword">
+            </div>
+
+
+            <div class="col-2">
+                <button class="btn btn-outline-primary w-100" type="submit">검색</button>
+            </div>
+
+
+        </form>
+
+        <div th:if="${reviewPage.isEmpty()}" class="text-center">
+            <div th:if="${isReviewsEmpty}">
+                <h2>
+                    <span>현재 등록된 리뷰가 없습니다.</span>
+                </h2>
+            </div>
+
+            <div th:if="${!isReviewsEmpty}">
+                <h2>
+                    <span th:text="${keyword}" class="text-info"></span>
+                    <span> 에 대한 검색결과가 없습니다.</span>
+                </h2>
+                <p>다른 검색어로 검색해주세요</p>
+            </div>
+
+        </div>
+
+        <div th:if="!${reviewPage.isEmpty()}">
+
+            <table border="1" class="table table-striped">
+                <thead>
+                <tr>
+                    <th class="col-1">ID</th>
+                    <th class="col-2">닉네임</th>
+                    <th class="col-4">내용</th>
+                    <th class="col-2">관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="review : ${reviewPage.content}">
+                    <td>
+                        <a th:text="${review.id}"></a>
+                    </td>
+                    <td>
+                        <a th:text="${review.nickname}"></a>
+                    </td>
+
+                    <td th:text="${review.content}" class="text-truncate" style="max-width: 150px;"></td>
+
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-danger open-modal-btn"
+                                data-bs-toggle="modal" th:attr="data-review-id=${review.id}" data-bs-target="#reviewDeleteModal">삭제</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <nav aria-label="Page navigation example" class="d-flex justify-content-center mt-3">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${reviewPage.isFirst()} ? 'disabled'">
+                        <a class="page-link" href="#"
+                           th:onclick="${startPage != 0} ? |location.href='@{/admin/reviews(searchCond=${searchCond}, keyword=${keyword}, page=${startPage-1})}'| : |location.href='@{/admin/reviews(searchCond=${searchCond}, keyword=${keyword}, page=${startPage})}'|">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:classappend="${i == reviewPage.number} ? 'active' : ''">
+                        <a class="page-link" th:href="@{/admin/reviews(searchCond=${searchCond}, keyword=${keyword}, page=${i})}" th:text="${i + 1}"></a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${reviewPage.isLast()} ? 'disabled'">
+                        <a class="page-link" href="#"
+                           th:onclick="${endPage != (reviewPage.getTotalPages() - 1)} ? |location.href='@{/admin/reviews(searchCond=${searchCond}, keyword=${keyword}, page=${endPage+1})}'| : |location.href='@{/admin/reviews(searchCond=${searchCond}, keyword=${keyword}, page=${endPage})}'|">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="reviewDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">회원 삭제</h5>
+            </div>
+            <div class="modal-body">
+                <p>정말로 삭제하시겠습니까?</p>
+                <p>회원정보가 영구적으로 사라집니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirmDelete">삭제</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    const csrfToken = $('meta[name="_csrf"]').attr('content');
+    const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+    // 회원마다 있는 삭제 버튼 클릭 시 리뷰 ID 저장
+    $(document).on('click', '.open-modal-btn', function() {
+        reviewId = $(this).data('review-id');
+    });
+
+    // 모달 창의 "리뷰 삭제" 버튼 클릭 시 AJAX로 리뷰 삭제 요청
+    $('#confirmDelete').click(function() {
+        $.ajax({
+            url: "/api/reviews/delete",
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(reviewId),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
+            },
+            success: function(response) {
+                $('#reviewDeleteModal').modal('hide');
+                alert(response); // 삭제 완료 메시지
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                alert("삭제 중 오류가 발생했습니다.");
+                location.reload();
+            }
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</body>
+</html>

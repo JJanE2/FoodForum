@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>FoodForum</title>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+
+<div class="d-flex vh-100 justify-content-center align-items-center text-center">
+  <div class="container border rounded shadow">
+    <form id="restaurant-signup-form" class="mx-auto row g-3">
+
+<!--      <input type="hidden" id="member" th:value="${member}">-->
+
+      <p class="h2 mt-5">Food Forum</p>
+      <p class="lead my-3">식당 등록</p>
+
+      <div class="col-12 text-start gx-0">
+        <label for="restaurantName" class="form-label">식당 이름</label>
+        <input type="text" class="form-control" id="restaurantName" name="restaurantName" required>
+      </div>
+
+      <div class="col-12 text-start gx-0">
+        <label for="description" class="form-label">식당 설명</label>
+        <input type="text" class="form-control" id="description" name="description" required>
+      </div>
+
+      <div id="menu-list" class="col-12 gx-0"></div>
+
+      <div class="col-12 gx-0">
+        <button type="button" class="btn btn-outline-success w-100" onclick="addMenuField()">메뉴 추가</button>
+      </div>
+
+      <div class="row col-12 my-3 gx-0">
+        <div class="col me-1">
+          <button type="submit" class="btn btn-outline-primary w-100">등록완료</button>
+        </div>
+        <div class="col ms-1">
+          <button type="button" class="btn btn-outline-primary w-100" onclick="history.back()">돌아가기</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+
+<script>
+
+    const csrfToken = $('meta[name="_csrf"]').attr('content');
+    const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+    $(document).ready(function() {
+        $('#restaurant-signup-form').on('submit', function(event) {
+            event.preventDefault(); // 기본 제출 방지
+
+            const formData = {
+<!--                ownerId: parseInt($('#ownerId').val(), 10),-->
+                restaurantName: $('#restaurantName').val(),
+                description: $('#description').val(),
+                menus: []
+            };
+
+            // 메뉴 항목을 배열에 추가
+            $('.menu-item').each(function(index) {
+                const menuName = $(this).find('input[name^="menus"]').eq(0).val(); // 메뉴 이름
+                const menuPrice = $(this).find('input[name^="menus"]').eq(1).val(); // 메뉴 가격
+                formData.menus.push({ name: menuName, price: menuPrice }); // 객체 추가
+            });
+
+            $.ajax({
+                url: '/api/restaurant/new',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
+                },
+                success: function(response) {
+                    alert(response);
+                    window.location.href = '/';
+                },
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
+                }
+            });
+        });
+    });
+
+    // 메뉴 항목 추가 함수
+    function addMenuField() {
+        const menuListDiv = document.getElementById('menu-list');
+        const newMenuDiv = document.createElement('div');
+        newMenuDiv.className = 'row my-2 menu-item gx-0'; // 행(row) 생성 및 하단 마진 추가
+
+        // 메뉴 이름 입력 필드 생성
+        const menuNameDiv = document.createElement('div');
+        menuNameDiv.className = 'col me-1';
+        const menuNameInput = document.createElement('input');
+        menuNameInput.type = 'text';
+        menuNameInput.name = `menus[${menuListDiv.children.length}].name`;
+        menuNameInput.className = 'form-control';
+        menuNameInput.placeholder = '메뉴 이름';
+        menuNameInput.required = true;
+        menuNameDiv.appendChild(menuNameInput); // 메뉴 이름 필드를 열에 추가
+
+        // 메뉴 가격 입력 필드 생성
+        const menuPriceDiv = document.createElement('div');
+        menuPriceDiv.className = 'col ms-1'; // Bootstrap의 열을 사용하여 한 줄에 두 개 배치
+        const menuPriceInput = document.createElement('input');
+        menuPriceInput.type = 'text';
+        menuPriceInput.name = `menus[${menuListDiv.children.length}].price`;
+        menuPriceInput.className = 'form-control';
+        menuPriceInput.placeholder = '메뉴 가격';
+        menuPriceInput.required = true;
+        menuPriceDiv.appendChild(menuPriceInput); // 메뉴 가격 필드를 열에 추가
+
+        // 새로운 메뉴 입력 필드를 메뉴 리스트 div에 추가
+        newMenuDiv.appendChild(menuNameDiv);
+        newMenuDiv.appendChild(menuPriceDiv);
+        menuListDiv.appendChild(newMenuDiv);
+    }
+
+</script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

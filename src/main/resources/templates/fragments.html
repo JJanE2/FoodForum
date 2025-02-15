@@ -1,0 +1,59 @@
+<!-- fragments.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <title>Food Forum</title>
+</head>
+<body>
+
+<!-- Header Fragment -->
+<div th:fragment="header">
+  <header>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand py-2" th:href="@{/}">Food Forum</a>
+
+        <div class="collapse navbar-collapse" sec:authorize="!isAuthenticated()">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0" >
+            <li class="nav-item">
+              <a class="nav-link fw-bold" th:href="@{/login}">로그인</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-bold" th:href="@{/member/new}">회원가입</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="collapse navbar-collapse" sec:authorize="isAuthenticated()">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0" >
+            <li class="nav-item">
+              <a class="nav-link fw-bold" th:href="@{/member}">설정</a>
+            </li>
+            <li class="nav-item">
+              <form th:action="@{/logout}" method="post">
+                <button class="nav-link fw-bold" type="submit">로그아웃</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+
+        <form class="d-flex col-4" role="search" th:action="@{/restaurants/search(restaurantName=${restaurantName})}" method="get">
+          <input class="form-control me-2 " type="search" placeholder="식당 이름을 입력하세요" aria-label="Search" id="restaurantName" name="restaurantName">
+          <button class="btn btn-outline-success col-2" type="submit">검색</button>
+        </form>
+      </div>
+    </nav>
+  </header>
+</div>
+
+<!-- Footer Fragment -->
+<div th:fragment="footer">
+  <footer>
+    <p>돌아가기</p>
+  </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/star-rating.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>FoodForum</title>
+</head>
+<body>
+
+<!-- Include the header -->
+<div th:replace="fragments :: header"></div>
+
+<div class="pt-5" id="memberReviews"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="reviewDeleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger">리뷰 삭제</h5>
+      </div>
+      <div class="modal-body">
+        <p>정말로 삭제하시겠습니까?</p>
+        <p>작성했던 리뷰정보가 영구적으로 사라집니다.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirmDelete">삭제</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+        const csrfToken = $('meta[name="_csrf"]').attr('content');
+        const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+        let cursorId = null; // 첫 요청 시 커서 ID 없음
+        let isLoading = false; // 로딩 중 여부 체크
+
+        // 리뷰 데이터를 불러오는 함수
+        function loadMoreReviews() {
+            if (isLoading) return; // 이미 로딩 중이면 중단
+            isLoading = true;
+            $('#loading').show(); // 로딩 표시
+
+            $.ajax({
+                url: '/api/member/reviews',
+                method: 'GET',
+                data: {
+                    cursorId: cursorId,
+                    pageSize: 10 // 가져올 레스토랑 개수
+                },
+                success: function(response) {
+
+                    // 리뷰 목록을 표시할 HTML 요소를 찾음
+                    var memberReviews = $('#memberReviews');
+
+                    // 데이터가 없으면 더 이상 로드하지 않음
+                    if (response.length === 0) {
+                        $(window).off('scroll'); // 스크롤 이벤트 해제
+                        $('#loading').hide(); // 로딩 표시 숨기기
+
+                        if (cursorId == null) {
+                            let noReviewHTML = `
+                                <div class="d-flex vh-100 justify-content-center align-items-center text-center" style="flex-direction:column;">
+                                    <h3>
+                                        <p>작성된 리뷰가 없습니다.</p>
+                                        <p>첫 리뷰를 작성해보세요</p>
+                                    </h3>
+                                    <div>
+                                        <a href="/" class="btn btn-primary" >메인으로</a>
+                                    </div>
+                                </div>`;
+                            memberReviews.append(noReviewHTML);
+                            return;
+                        }
+                        return;
+                    }
+
+                    // 각 리뷰 데이터를 HTML로 변환하여 페이지에 추가
+                    response.forEach(function(review) {
+                    const date = new Date(review.date);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const formattedDate = `${year}/${month}/${day}`;
+
+                    const starRating = review.starRating; // 총 별점 가져오기
+                        let stars = '';
+
+                        // 별점에 따른 별 표시 생성
+                        for (let i = 0; i < 5; i++) {
+                            if (starRating >= i + 1) {
+                                stars += '★'; // 전체 별
+                            } else if (starRating >= i + 0.5) {
+                                stars += '☆'; // 반 별
+                            } else {
+                                stars += '☆'; // 빈 별
+                            }
+                        }
+
+                    let reviewHTML = `
+                        <div class="rounded border shadow container align-items-center mt-5">
+                            <div class="row justify-content-between pt-3 pb-0">
+                                <div class="col-4">
+                                    <a href="/restaurants/${review.restaurantId}">${review.restaurantName}</a>
+                                </div>
+                                <div class="col-2 text-end me-1">
+                                    ${formattedDate}
+                                </div>
+                             </div>
+
+                            <div class="row justify-content-start mb-2">
+                                <div class="col-2">
+                                    <span class="star-rating">${stars}</span>
+                                </div>
+
+                            </div>
+
+                            <div class="row justify-content-start mb-2">
+                                <p>${review.content}</p>
+                            </div>
+
+                            <div class="row justify-content-end mb-3">
+                                <div class="d-flex align-items-center justify-content-center col-auto pe-2">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='/reviews/${review.id}/update'">리뷰 수정</button>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center col-auto p-0 me-3">
+                                    <button type="button" class="btn btn-sm btn-outline-danger open-modal-btn"
+                                     data-bs-toggle="modal" data-review-id="${review.id}" data-bs-target="#reviewDeleteModal">삭제</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    memberReviews.append(reviewHTML);
+                    });
+
+                    // 마지막 리뷰의 ID를 새로운 커서로 설정
+                    cursorId = response[response.length - 1].id;
+                    isLoading = false;
+                    $('#loading').hide(); // 로딩 표시 숨기기
+
+                },
+                error: function(xhr, status, error) {
+                    console.error('리뷰 로드 실패:', error);
+                    isLoading = false;
+                    $('#loading').hide(); // 로딩 표시 숨기기
+                }
+            });
+        }
+
+        // 스크롤 이벤트 등록
+        $(window).on('scroll', function() {
+            // 페이지의 끝에 도달했을 때 추가 데이터를 로드
+            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                loadMoreReviews();
+            }
+        });
+
+        // 페이지 로드 시 첫 데이터 로드
+        $(document).ready(function() {
+            loadMoreReviews();
+        });
+
+        // 리뷰마다 있는 삭제 버튼 클릭 시 리뷰 ID 저장
+        $(document).on('click', '.open-modal-btn', function() {
+            reviewId = $(this).data('review-id');
+        });
+
+        // 모달 창의 "리뷰 삭제" 버튼 클릭 시 AJAX로 리뷰 삭제 요청
+        $('#confirmDelete').click(function() {
+            $.ajax({
+                url: `/api/reviews/delete/${reviewId}`,
+                method: 'POST',
+                beforeSend: function (xhr) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
+                },
+                success: function(response) {
+                    $('#reviewDeleteModal').modal('hide');
+                    alert(response); // 삭제 완료 메시지
+                    window.location.href = '/reviews';
+                },
+                error: function(xhr, status, error) {
+                    alert("리뷰 삭제 중 오류가 발생했습니다.");
+                }
+            });
+        });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

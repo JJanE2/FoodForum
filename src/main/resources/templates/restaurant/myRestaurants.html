@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>FoodForum</title>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/star-rating.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+
+<div class="fixed-bottom text-end mb-4 me-5">
+  <button class="btn btn-lg btn-success" th:onclick="|location.href='@{/restaurants/new}'|">식당 등록</button>
+</div>
+
+<!-- Include the header -->
+<div th:replace="fragments :: header"></div>
+
+<div class="d-flex vh-100 justify-content-center align-items-center">
+  <div class="w-75">
+
+    <div th:if="${restaurantPage.isEmpty()}" class="text-center">
+      <h2>아직 식당을 등록하지 않았습니다.</h2>
+      <p>오른쪽 하단 식당등록 버튼을 통해 식당을 등록해주세요</p>
+    </div>
+
+    <div th:if="!${restaurantPage.isEmpty()}">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th class="col-3">식당 이름</th>
+          <th class="col-2">별점</th>
+          <th class="col-4">식당관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="restaurant : ${restaurantPage.content}">
+
+          <td>
+            <a th:href="@{/restaurants/{id}(id=${restaurant.id})}" th:text="${restaurant.name}"></a>
+          </td>
+
+          <!-- 별점 -->
+          <td>
+            <span class="star-rating" th:if="${restaurant.totalRating >= 5}">★★★★★</span>
+            <span class="star-rating" th:if="${restaurant.totalRating >= 4 && restaurant.totalRating < 5}">★★★★☆</span>
+            <span class="star-rating" th:if="${restaurant.totalRating >= 3 && restaurant.totalRating < 4}">★★★☆☆</span>
+            <span class="star-rating" th:if="${restaurant.totalRating >= 2 && restaurant.totalRating < 3}">★★☆☆☆</span>
+            <span class="star-rating" th:if="${restaurant.totalRating >= 1 && restaurant.totalRating < 2}">★☆☆☆☆</span>
+            <span class="star-rating" th:if="${restaurant.totalRating < 1}">☆☆☆☆☆</span>
+          </td>
+
+          <!-- 소개 -->
+          <td>
+            <button type="button" class="btn btn-sm btn-outline-primary me-2" th:onclick="|location.href='@{/restaurants/{id}/update(id=${restaurant.id})}'|">수정</button>
+
+            <button type="button" class="btn btn-sm btn-outline-danger open-modal-btn"
+                    data-bs-toggle="modal" th:attr="data-restaurant-id=${restaurant.id}" data-bs-target="#restaurantDeleteModal">삭제</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <nav aria-label="Page navigation example" class="d-flex justify-content-center mt-3">
+        <ul class="pagination">
+          <li class="page-item" th:classappend="${restaurantPage.isFirst()} ? 'disabled'">
+            <a class="page-link" href="#"
+               th:onclick="${startPage != 0} ? |location.href='@{/member/restaurants(restaurantName=${restaurantName}, page=${startPage-1})}'| : |location.href='@{/member/restaurants(restaurantName=${restaurantName}, page=${startPage})}'|">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+
+          <li class="page-item" th:each="i : ${#numbers.sequence(startPage, endPage)}" th:classappend="${i == restaurantPage.number} ? 'active' : ''">
+            <a class="page-link" th:href="@{/member/restaurants(restaurantName=${restaurantName}, page=${i})}" th:text="${i + 1}"></a>
+          </li>
+
+          <li class="page-item" th:classappend="${restaurantPage.isLast()} ? 'disabled'">
+            <a class="page-link" href="#"
+               th:onclick="${endPage != (restaurantPage.getTotalPages() - 1)} ? |location.href='@{/member/restaurants(restaurantName=${restaurantName}, page=${endPage+1})}'| : |location.href='@{/member/restaurants(restaurantName=${restaurantName}, page=${endPage})}'|">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="restaurantDeleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger">식당 삭제</h5>
+      </div>
+      <div class="modal-body">
+        <p>정말로 삭제하시겠습니까?</p>
+        <p>식당정보가 영구적으로 사라집니다.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirmDelete">삭제</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script>
+
+    const csrfToken = $('meta[name="_csrf"]').attr('content');
+    const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+    // 식당마다 있는 삭제 버튼 클릭 시 리뷰 ID 저장
+    $(document).on('click', '.open-modal-btn', function() {
+        restaurantId = $(this).data('restaurant-id');
+    });
+
+    // 모달 창의 "리뷰 삭제" 버튼 클릭 시 AJAX로 리뷰 삭제 요청
+    $('#confirmDelete').click(function() {
+        $.ajax({
+            url: "/api/restaurants/" + restaurantId + "/delete",
+
+            method: 'POST',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
+            },
+            success: function(response) {
+                $('#restaurantDeleteModal').modal('hide');
+                alert(response); // 삭제 완료 메시지
+                location.href = '/member/restaurants';
+            },
+            error: function(xhr, status, error) {
+                alert("삭제 중 오류가 발생했습니다.");
+                location.reload();
+            }
+        });
+    });
+</script>
+</body>
+</html>

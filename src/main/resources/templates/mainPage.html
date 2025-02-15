@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/star-rating.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <title>FoodForum</title>
+</head>
+<body>
+
+<!-- Include the header -->
+<div th:replace="~{fragments :: header}"></div>
+
+
+<div class="d-flex vh-100 justify-content-center flex-start">
+    <div class="w-75 mt-5">
+
+        <h1 class="text-center pt-5 mb-5">Restaurant List</h1>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="col-2">식당 이름</th>
+                        <th class="col-1">별점</th>
+                        <th class="col-5">소개</th>
+                    </tr>
+                </thead>
+                <tbody id="restaurant-list"></tbody>
+            </table>
+        </div>
+        <div id="loading" style="display:none;">로딩 중...</div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+
+        let cursorId = null; // 첫 요청 시 커서 ID 없음
+        let isLoading = false; // 로딩 중 여부 체크
+
+        // 레스토랑 데이터를 불러오는 함수
+        function loadMoreRestaurants() {
+            if (isLoading) return; // 이미 로딩 중이면 중단
+            isLoading = true;
+            $('#loading').show(); // 로딩 표시
+
+            $.ajax({
+                url: '/api/restaurants',
+                method: 'GET',
+                data: {
+                    cursorId: cursorId,
+                    pageSize: 15 // 가져올 레스토랑 개수
+                },
+                success: function(response) {
+                    // 데이터가 없으면 더 이상 로드하지 않음
+                    if (response.length === 0) {
+                        $(window).off('scroll'); // 스크롤 이벤트 해제
+                        $('#loading').hide(); // 로딩 표시 숨기기
+                        return;
+                    }
+
+                    // 응답 데이터를 화면에 추가
+                    response.forEach(restaurant => {
+                        const totalRating = restaurant.totalRating; // 총 별점 가져오기
+                        let stars = '';
+
+                        // 별점에 따른 별 표시 생성
+                        for (let i = 0; i < 5; i++) {
+                            if (totalRating >= i + 1) {
+                                stars += '★'; // 전체 별
+                            } else if (totalRating >= i + 0.5) {
+                                stars += '☆'; // 반 별
+                            } else {
+                                stars += '☆'; // 빈 별
+                            }
+                        }
+
+                        $('#restaurant-list').append(`
+                            <tr>
+                                <td><a href='/restaurants/${restaurant.id}'>${restaurant.name}</a></td>
+                                <td><span class="star-rating">${stars}</span></td>
+                                <td class="text-truncate" style="max-width: 150px;">${restaurant.description}</td>
+                            </tr>
+                        `);
+                    });
+
+                    // 마지막 레스토랑의 ID를 새로운 커서로 설정
+                    cursorId = response[response.length - 1].id;
+                    isLoading = false;
+                    $('#loading').hide(); // 로딩 표시 숨기기
+                },
+                error: function(xhr, status, error) {
+                    console.error('레스토랑 로드 실패:', error);
+                    isLoading = false;
+                    $('#loading').hide(); // 로딩 표시 숨기기
+                }
+            });
+        }
+
+        // 스크롤 이벤트 등록
+        $(window).on('scroll', function() {
+            // 페이지의 끝에 도달했을 때 추가 데이터를 로드
+            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                loadMoreRestaurants();
+            }
+        });
+
+        // 페이지 로드 시 첫 데이터 로드
+        $(document).ready(function() {
+            loadMoreRestaurants();
+        });
+    </script>
+</html>

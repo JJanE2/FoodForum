@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FoodForum</title>
+</head>
+<body>
+
+<form th:action="@{/member/delete}" method="post">
+    <div>
+        <label for="password">정말 탈퇴하시겠습니까? </label>
+        <input type="password" id="password" name="password" placeholder="다시 비밀번호를 입력하세요"/>
+    </div>
+    <div>
+        <button type="submit">회원탈퇴</button>
+        <button type="button" th:onclick="|location.href='@{/member}'|">돌아가기</button>
+    </div>
+</form>
+</body>
+</html>
