@@ -35,7 +35,6 @@ public class Restaurant {
     @JoinColumn(name = "member_id")
     private Member member;
 
-//    private Long ownerId;
 
     public Restaurant(String name, String description) {
         this.name = name;
