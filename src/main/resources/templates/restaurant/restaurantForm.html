@@ -115,7 +115,10 @@
             const formData = {
                 restaurantName: $('#restaurantName').val(),
                 description: $('#description').val(),
-                menus: []
+                menus: [],
+                address: $('#address').val(),
+                latitude: parseFloat($('#latitude').val()),
+                longitude: parseFloat($('#longitude').val())
             };
 
             // 메뉴 항목을 배열에 추가

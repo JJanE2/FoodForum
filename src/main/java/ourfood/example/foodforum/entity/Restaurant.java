@@ -35,6 +35,11 @@ public class Restaurant {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    private String address;
+
+    private Double latitude;
+
+    private Double longitude;
 
     public Restaurant(String name, String description) {
         this.name = name;
@@ -47,11 +52,14 @@ public class Restaurant {
         this.description = description;
     }
 
-    public Restaurant(Member member, String name, String description, List<Menu> menus) {
+    public Restaurant(Member member, String name, String description,
+                      String address, Double latitude, Double longitude) {
         this.member = member;
         this.name = name;
         this.description = description;
-        this.menus = menus;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public void addMenu(Menu menu) {

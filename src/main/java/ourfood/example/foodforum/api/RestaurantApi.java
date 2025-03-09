@@ -47,7 +47,9 @@ public class RestaurantApi {
     public ResponseEntity<String> postRestaurant(@RequestBody RestaurantDTO.Create restaurantCreateDTO,
                                                  @AuthenticationPrincipal UserDetails userDetails) {
         Member findMember = memberService.findByName(userDetails.getUsername());
-        Restaurant restaurant = new Restaurant(findMember, restaurantCreateDTO.getRestaurantName(), restaurantCreateDTO.getDescription());
+        Restaurant restaurant = new Restaurant(findMember, restaurantCreateDTO.getRestaurantName(), restaurantCreateDTO.getDescription(),
+                restaurantCreateDTO.getAddress(), restaurantCreateDTO.getLatitude(), restaurantCreateDTO.getLongitude());
+
 
         if (restaurantService.join(restaurant) != null) {
             findMember.addRestaurant(restaurant);

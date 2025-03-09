@@ -22,9 +22,15 @@ public class QRestaurant extends EntityPathBase<Restaurant> {
 
     public static final QRestaurant restaurant = new QRestaurant("restaurant");
 
+    public final StringPath address = createString("address");
+
     public final StringPath description = createString("description");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final NumberPath<Double> latitude = createNumber("latitude", Double.class);
+
+    public final NumberPath<Double> longitude = createNumber("longitude", Double.class);
 
     public final QMember member;
 

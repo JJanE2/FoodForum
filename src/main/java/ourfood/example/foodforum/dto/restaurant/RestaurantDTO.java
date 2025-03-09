@@ -17,6 +17,9 @@ public class RestaurantDTO {
         private String restaurantName;
         private String description;
         private List<Menu> menus;
+        private String address;
+        private Double latitude;
+        private Double longitude;
     }
 
     @Data
