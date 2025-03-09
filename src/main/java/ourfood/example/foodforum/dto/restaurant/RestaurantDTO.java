@@ -46,13 +46,20 @@ public class RestaurantDTO {
         private String description;
         private Double starRating;
         private List<MenuDTO.Create> menus;
+        private String address;
+        private Double latitude;
+        private Double longitude;
 
-        public DetailInfo(Long id, String name, String description, Double starRating, List<MenuDTO.Create> menus) {
+        public DetailInfo(Long id, String name, String description, Double starRating, List<MenuDTO.Create> menus,
+                          String address, Double latitude, Double longitude) {
             this.id = id;
             this.name = name;
             this.description = description;
             this.starRating = starRating;
             this.menus = menus;
+            this.address =address;
+            this.latitude = latitude;
+            this.longitude = longitude;
         }
     }
 

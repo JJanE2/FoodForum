@@ -85,7 +85,8 @@ public class RestaurantApi {
                 .collect(Collectors.toList());
 
         return new RestaurantDTO.DetailInfo(restaurant.getId(), restaurant.getName(), restaurant.getDescription(),
-                restaurant.getTotalRating(), menus);
+                restaurant.getTotalRating(), menus,
+                restaurant.getAddress(), restaurant.getLatitude(), restaurant.getLongitude());
     }
 
     // Restaurant menu 추가후 상세페이지 이동을 위해 restaurantId 반환
