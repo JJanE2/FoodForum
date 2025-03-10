@@ -55,7 +55,9 @@ public class RestaurantController {
         if (myRestaurant) {
             Restaurant findRestaurant = restaurantService.findById(id);
 
-            RestaurantDTO.Update restaurantUpdateDTO = new RestaurantDTO.Update(findRestaurant.getId(), findRestaurant.getName(), findRestaurant.getDescription(), findRestaurant.getMenus());
+            RestaurantDTO.Update restaurantUpdateDTO =
+                    new RestaurantDTO.Update(findRestaurant.getId(), findRestaurant.getName(), findRestaurant.getDescription(),
+                            findRestaurant.getMenus(), findRestaurant.getAddress(), findRestaurant.getLatitude(), findRestaurant.getLongitude());
             model.addAttribute("restaurantUpdateDTO", restaurantUpdateDTO);
             return "restaurant/restaurantUpdateForm";
         }

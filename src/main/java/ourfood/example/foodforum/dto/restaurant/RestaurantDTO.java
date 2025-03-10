@@ -70,12 +70,19 @@ public class RestaurantDTO {
         private String name;
         private String description;
         private List<Menu> menus;
+        private String address;
+        private Double latitude;
+        private Double longitude;
 
-        public Update(Long id, String name, String description, List<Menu> menus) {
+        public Update(Long id, String name, String description, List<Menu> menus,
+                      String address, Double latitude, Double longitude) {
             this.id = id;
             this.name = name;
             this.description = description;
             this.menus = menus;
+            this.address =address;
+            this.latitude = latitude;
+            this.longitude = longitude;
         }
     }
 
@@ -84,6 +91,9 @@ public class RestaurantDTO {
         private String name;
         private String description;
         private List<MenuDTO.Update> menus;
+        private String address;
+        private Double latitude;
+        private Double longitude;
     }
 
     @Data

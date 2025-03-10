@@ -89,9 +89,13 @@ public class Restaurant {
         this.totalRating = totalRating;
     }
 
-    public Long updateRestaurant(String newName, String newDescription) {
+    public Long updateRestaurant(String newName, String newDescription,
+                                 String newAddress, Double newLatitude, Double newLongitude) {
         this.name = newName;
         this.description = newDescription;
+        this.address = newAddress;
+        this.latitude = newLatitude;
+        this.longitude = newLongitude;
         return this.id;
     }
 }

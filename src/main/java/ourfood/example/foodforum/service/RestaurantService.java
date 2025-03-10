@@ -118,12 +118,13 @@ public class RestaurantService {
         restaurantRepository.delete(restaurant);
     }
 
-    public Long updateRestaurant(Long restaurantId, String newName, String newDescription, List<MenuDTO.Update> newMenus) {
+    public Long updateRestaurant(Long restaurantId, String newName, String newDescription, List<MenuDTO.Update> newMenus,
+                                 String newAddress, Double newLatitude, Double newLongitude) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId).get();
         for (MenuDTO.Update newMenu : newMenus) {
             menuService.updateMenu(newMenu.getId(), newMenu.getName(), newMenu.getPrice());
         }
-        return restaurant.updateRestaurant(newName, newDescription);
+        return restaurant.updateRestaurant(newName, newDescription, newAddress, newLatitude, newLongitude);
     }
 
     public List<RestaurantDTO.BasicInfo> getRestaurantByCursor(Long cursorId, int pageSize) {

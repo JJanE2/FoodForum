@@ -100,7 +100,8 @@ public class RestaurantApi {
     // restaurant 기본 정보 수정
     @PostMapping("/restaurants/{id}/update")
     public Long updateRestaurantInfo(@PathVariable Long id, @RequestBody RestaurantDTO.UpdateRequest restaurantRequestDTO) {
-        return restaurantService.updateRestaurant(id, restaurantRequestDTO.getName(), restaurantRequestDTO.getDescription(), restaurantRequestDTO.getMenus());
+        return restaurantService.updateRestaurant(id, restaurantRequestDTO.getName(), restaurantRequestDTO.getDescription(), restaurantRequestDTO.getMenus(),
+                restaurantRequestDTO.getAddress(), restaurantRequestDTO.getLatitude(), restaurantRequestDTO.getLongitude());
     }
 
     @Operation(summary = "Restaurant 조건 검색 (이름, 별점)")
