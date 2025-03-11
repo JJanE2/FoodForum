@@ -25,20 +25,18 @@
 
         <div th:if="!${restaurantPage.isEmpty()}">
 
-            <div class="row my-3">
-                <div class="col-1 gx-1 ms-3">
+            <div class="d-flex my-3">
+                <div class="ms-1 me-3">
                     <a th:href="@{/restaurants/search(restaurantName=${restaurantName}, page=0, orderField='totalRating')}"
                        class="text-decoration-none" style="color: #FF6600;"
                        th:classappend="${orderField == 'totalRating' ? 'fw-bold' : ''}">별점 순</a>
                 </div>
-                <div class="col-2 gx-1">
+                <div>
                     <a th:href="@{/restaurants/search(restaurantName=${restaurantName}, page=0, orderField='reviewCount')}"
                        class="text-decoration-none" style="color: #FF6600;"
                        th:classappend="${orderField == 'reviewCount' ? 'fw-bold' : ''}">리뷰 많은 순</a>
                 </div>
             </div>
-
-
 
             <table border="1" class="table table-striped">
                 <thead>
