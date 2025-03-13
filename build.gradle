@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ourfood.example'
-version = '0.0.3'
+version = '0.0.1'
 
 java {
 	toolchain {
@@ -33,7 +33,6 @@ dependencies {
 
 
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
-	implementation 'org.springframework.boot:spring-boot-starter-logging'
 
 
 	compileOnly 'org.projectlombok:lombok'
