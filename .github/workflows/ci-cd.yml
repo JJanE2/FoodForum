@@ -19,6 +19,9 @@ jobs:
       - name: Decode application.yml from secret and save it to resources
         run: |
           echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
+  
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
       - name: Build with Gradle (bootJar)
         run: ./gradlew bootJar
