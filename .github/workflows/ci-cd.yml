@@ -23,7 +23,7 @@ jobs:
       - name: Decode keystore.p12 from secret and save to it to resources
         run: |
           echo "${{ secrets.KEYSTORE_P12 }}" | base64 --decode > src/main/resources/keystore.p12
-  
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
@@ -66,5 +66,8 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
-            sudo mv /home/${{ secrets.EC2_USER }}/foodforum-0.0.1.jar /springboot/foodforum-0.0.1.jar
-            sudo nohup java -Dspring.profiles.active=prod -jar /springboot/foodforum-0.0.1.jar > /dev/null 2>&1 &
+            pwd
+            cd /home/${{ secrets.EC2_USER }}
+            sudo mv foodforum-0.0.1.jar /home/${{ secrets.EC2_USER }}/springboot
+            cd springboot
+            sudo nohup java -Dspring.profiles.active=prod -jar foodforum-0.0.1.jar > /dev/null 2>&1 &
