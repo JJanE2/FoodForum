@@ -66,8 +66,6 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
-            pwd
-            cd /home/${{ secrets.EC2_USER }}
             sudo mv foodforum-0.0.1.jar /home/${{ secrets.EC2_USER }}/springboot
             cd springboot
             sudo nohup java -Dspring.profiles.active=prod -jar foodforum-0.0.1.jar > /dev/null 2>&1 &
