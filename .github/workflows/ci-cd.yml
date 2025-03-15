@@ -57,8 +57,14 @@ jobs:
             else
               echo "No running JAR process found."
             fi
-
-
-
-
-
+            
+      - name: Move JAR file and run with nohup
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          script: |
+            sudo mv /home/${{ secrets.EC2_USER }}/foodforum-0.0.1.jar /springboot/foodforum-0.0.1.jar
+            sudo nohup java -Dspring.profiles.active=prod -jar /springboot/foodforum-0.0.1.jar > /dev/null 2>&1 &
