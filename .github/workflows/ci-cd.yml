@@ -30,8 +30,8 @@ jobs:
       - name: Build with Gradle (bootJar)
         run: ./gradlew bootJar
 
-      - name: Check JAR file location
-        run: ls -alhR build/libs
+      - name: Change directory to build/libs
+        run: cd build/libs
 
       - name: Upload JAR to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -39,5 +39,5 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: "build/libs/foodforum-0.0.1.jar"
+          source: "foodforum-0.0.1.jar"
           target: "/home/${{ secrets.EC2_USER }}/"
