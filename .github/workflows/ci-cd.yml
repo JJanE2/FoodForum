@@ -33,12 +33,11 @@ jobs:
       - name: Check JAR file location
         run: ls -alhR build/libs
 
-      # - name: Upload JAR to EC2
-      #   uses: appleboy/ssh-action@v0.1.7
-      #   with:
-      #     host: ${{ secrets.EC2_HOST }}
-      #     username: ${{ secrets.EC2_USER }}
-      #     key: ${{ secrets.EC2_PRIVATE_KEY }}
-      #     port: 22
-      #     script: |
-      #       scp -o StrictHostKeyChecking=no build/libs/foodforum-0.0.1.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/
+      - name: Upload JAR to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          source: "build/libs/foodforum-0.0.1.jar"
+          target: "/home/${{ secrets.EC2_USER }}/"
