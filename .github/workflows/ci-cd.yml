@@ -30,8 +30,8 @@ jobs:
       - name: Build with Gradle (bootJar)
         run: ./gradlew bootJar
 
-      - name: Change directory to build/libs
-        run: cd build/libs
+      - name: Move JAR to Root directory
+        run: mv ./build/libs/foodforum-0.0.1.jar ./foodforum-0.0.1.jar
 
       - name: Upload JAR to EC2
         uses: appleboy/scp-action@v0.1.7
