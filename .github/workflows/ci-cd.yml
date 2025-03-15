@@ -50,10 +50,10 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
-            pid=$(ps aux | grep 'java -jar' | grep -v grep | awk '{print $2}')
+            pid=$(sudo ps aux | grep 'java.*-jar' | grep -v grep | awk '{print $2}')
             if [ -n "$pid" ]; then
               echo "Stopping existing JAR process (PID: $pid)"
-              kill -9 $pid
+              sudo kill -9 $pid
             else
               echo "No running JAR process found."
             fi
