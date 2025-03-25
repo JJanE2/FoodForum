@@ -2,9 +2,6 @@
 # AWS 계정 관련
 /src/main/resources/application.yml
 
-# 초기화 데이터
-/src/main/java/ourfood/example/foodforum/init/DataInitializer.java
-
 # SSL 인증서 관련 파일
 *.p12
 *.pem
