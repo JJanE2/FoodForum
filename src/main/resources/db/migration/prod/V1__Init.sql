@@ -1,8 +1,3 @@
-DROP TABLE IF EXISTS menu;
-DROP TABLE IF EXISTS review;
-DROP TABLE IF EXISTS restaurant;
-DROP TABLE IF EXISTS member;
-
 CREATE TABLE member (
         member_id bigint not null AUTO_INCREMENT primary key,
         member_name varchar(255),
