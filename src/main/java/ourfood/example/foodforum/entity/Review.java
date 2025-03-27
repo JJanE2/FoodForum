@@ -11,6 +11,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,6 +41,9 @@ public class Review {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime date;
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    private List<Recommendation> recommendations = new ArrayList<>();
 
     public Review(String content, Member member, Restaurant restaurant, Double starRating) {
         this.content = content;

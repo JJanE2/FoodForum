@@ -39,6 +39,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Recommendation> recommendations = new ArrayList<>();
+
     public Member(String name, String nickname, String password, ROLE role) {
         this.name = name;
         this.nickname = nickname;

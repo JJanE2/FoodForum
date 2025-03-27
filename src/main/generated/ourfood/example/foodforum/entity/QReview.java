@@ -30,6 +30,8 @@ public class QReview extends EntityPathBase<Review> {
 
     public final QMember member;
 
+    public final ListPath<Recommendation, QRecommendation> recommendations = this.<Recommendation, QRecommendation>createList("recommendations", Recommendation.class, QRecommendation.class, PathInits.DIRECT2);
+
     public final QRestaurant restaurant;
 
     public final NumberPath<Double> starRating = createNumber("starRating", Double.class);

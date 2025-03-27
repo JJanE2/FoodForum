@@ -60,12 +60,15 @@ public class DataInitializer {
         Restaurant restaurant2 = restaurantRepository.findById(3L).get();
         Restaurant restaurant3 = restaurantRepository.findById(5L).get();
 
-        restaurant.setTotalRating(restaurant.calculateTotalRating());
-        restaurant2.setTotalRating(restaurant2.calculateTotalRating());
-        restaurant3.setTotalRating(restaurant3.calculateTotalRating());
+
+        if (restaurant.getTotalRating() == 0.0) {
+            restaurant.setTotalRating(restaurant.calculateTotalRating());
+            restaurant2.setTotalRating(restaurant2.calculateTotalRating());
+            restaurant3.setTotalRating(restaurant3.calculateTotalRating());
+        }
     }
 
     private boolean isRawPassword(String password) {
-        return password != null && !password.startsWith("{bcrypt}");
+        return password != null && !(password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$"));
     }
 }
