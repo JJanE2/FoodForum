@@ -33,4 +33,9 @@ public class Recommendation {
         member.getRecommendations().add(this);
     }
 
+    public void removeRecommendation(Review review, Member member) {
+        review.getRecommendations().remove(this);
+        member.getRecommendations().remove(this);
+    }
+
 }
