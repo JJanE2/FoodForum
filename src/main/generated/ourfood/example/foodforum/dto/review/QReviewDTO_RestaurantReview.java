@@ -13,8 +13,8 @@ public class QReviewDTO_RestaurantReview extends ConstructorExpression<ReviewDTO
 
     private static final long serialVersionUID = -1218957840L;
 
-    public QReviewDTO_RestaurantReview(com.querydsl.core.types.Expression<Long> id, com.querydsl.core.types.Expression<String> memberNickname, com.querydsl.core.types.Expression<String> content, com.querydsl.core.types.Expression<Double> starRating, com.querydsl.core.types.Expression<java.time.LocalDateTime> date) {
-        super(ReviewDTO.RestaurantReview.class, new Class<?>[]{long.class, String.class, String.class, double.class, java.time.LocalDateTime.class}, id, memberNickname, content, starRating, date);
+    public QReviewDTO_RestaurantReview(com.querydsl.core.types.Expression<Long> id, com.querydsl.core.types.Expression<String> memberNickname, com.querydsl.core.types.Expression<String> content, com.querydsl.core.types.Expression<Double> starRating, com.querydsl.core.types.Expression<java.time.LocalDateTime> date, com.querydsl.core.types.Expression<Long> recommendationCount) {
+        super(ReviewDTO.RestaurantReview.class, new Class<?>[]{long.class, String.class, String.class, double.class, java.time.LocalDateTime.class, long.class}, id, memberNickname, content, starRating, date, recommendationCount);
     }
 
 }

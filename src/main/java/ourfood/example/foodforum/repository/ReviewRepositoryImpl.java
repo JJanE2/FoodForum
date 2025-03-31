@@ -7,14 +7,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-import ourfood.example.foodforum.dto.review.QReviewDTO_RestaurantReview;
 import ourfood.example.foodforum.dto.review.QReviewDTO_Search;
 import ourfood.example.foodforum.dto.review.ReviewDTO;
 import ourfood.example.foodforum.entity.Review;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static ourfood.example.foodforum.entity.QRestaurant.restaurant;
+import static ourfood.example.foodforum.entity.QMember.member;
+import static ourfood.example.foodforum.entity.QRecommendation.*;
 import static ourfood.example.foodforum.entity.QReview.review;
 
 @RequiredArgsConstructor
@@ -24,16 +25,32 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
     @Override
     public List<ReviewDTO.RestaurantReview> getRestaurantReviewsById(Long restaurantId, Long cursorId, Pageable pageable) {
-        return queryFactory
-                .select(new QReviewDTO_RestaurantReview(
-                        review.id, review.member.nickname, review.content, review.starRating, review.date
-                ))
-                .from(review)
+        // fetch join 으로 recommendation, member 즉시 로딩
+        List<Review> reviews = queryFactory
+                .selectFrom(review)
+                .leftJoin(review.recommendations, recommendation).fetchJoin()
+                .innerJoin(review.member, member).fetchJoin()
                 .where(review.restaurant.id.eq(restaurantId)
                         .and(cursorId != null ? review.id.lt(cursorId) : null))
                 .orderBy(review.id.desc())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        // review entity 를 DTO 로 변환 후 반환
+        return reviews.stream()
+                .map(review -> {
+                    long recommendationCount = review.getRecommendations().size();
+                    return new ReviewDTO.RestaurantReview(
+                            review.getId(),
+                            review.getMember().getNickname(),
+                            review.getContent(),
+                            review.getStarRating(),
+                            review.getDate(),
+                            recommendationCount
+                    );
+                })
+                .collect(Collectors.toList());
+
     }
 
     @Override

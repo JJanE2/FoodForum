@@ -69,14 +69,16 @@ public class ReviewDTO {
         private Double starRating;
         @JsonFormat(pattern = "yyyy/MM/dd")
         private LocalDateTime date;
+        private Long recommendationCount;
 
         @QueryProjection
-        public RestaurantReview(Long id, String memberNickname, String content, Double starRating, LocalDateTime date) {
+        public RestaurantReview(Long id, String memberNickname, String content, Double starRating, LocalDateTime date, Long recommendationCount) {
             this.id = id;
             this.memberNickname = memberNickname;
             this.content = content;
             this.starRating = starRating;
             this.date = date;
+            this.recommendationCount = recommendationCount;
         }
     }
 
