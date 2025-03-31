@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,7 +42,7 @@ public class Member {
     private MemberStatus status;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Recommendation> recommendations = new ArrayList<>();
+    private Set<Recommendation> recommendations = new HashSet<>();
 
     public Member(String name, String nickname, String password, ROLE role) {
         this.name = name;
@@ -69,5 +71,10 @@ public class Member {
 
     public void addRestaurant(Restaurant restaurant) {
         this.restaurants.add(restaurant);
+    }
+
+    public boolean isRecommended(Long reviewId) {
+        return recommendations.stream()
+                .anyMatch(rec -> rec.getReview().getId().equals(reviewId));
     }
 }

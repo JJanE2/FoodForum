@@ -12,7 +12,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -43,7 +45,7 @@ public class Review {
     private LocalDateTime date;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
-    private List<Recommendation> recommendations = new ArrayList<>();
+    private Set<Recommendation> recommendations = new HashSet<>();
 
     public Review(String content, Member member, Restaurant restaurant, Double starRating) {
         this.content = content;

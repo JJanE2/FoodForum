@@ -28,7 +28,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath password = createString("password");
 
-    public final ListPath<Recommendation, QRecommendation> recommendations = this.<Recommendation, QRecommendation>createList("recommendations", Recommendation.class, QRecommendation.class, PathInits.DIRECT2);
+    public final SetPath<Recommendation, QRecommendation> recommendations = this.<Recommendation, QRecommendation>createSet("recommendations", Recommendation.class, QRecommendation.class, PathInits.DIRECT2);
 
     public final ListPath<Restaurant, QRestaurant> restaurants = this.<Restaurant, QRestaurant>createList("restaurants", Restaurant.class, QRestaurant.class, PathInits.DIRECT2);
 
