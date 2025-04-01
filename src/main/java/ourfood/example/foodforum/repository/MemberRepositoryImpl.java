@@ -33,7 +33,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
 
         return queryFactory
                 .select(new QReviewDTO_Mine(
-                        review.id, review.restaurant.name, review.restaurant.id, review.content, review.starRating, review.date
+                        review.id, review.restaurant.name, review.restaurant.id, review.content, review.starRating, review.date,
+                        review.recommendations.size()
                 ))
                 .from(review)
                 .where(review.member.id.eq(memberId)
