@@ -48,6 +48,8 @@
             $('#member-update-form').on('submit', function(event) {
                 event.preventDefault(); // 기본 제출 방지
 
+                const id = parseInt($('#memberId').val(), 10);
+
                 const formData = {
                     memberId: parseInt($('#memberId').val(), 10),
                     memberName: $('#memberName').val(),
@@ -56,7 +58,7 @@
                 };
 
                 $.ajax({
-                    url: '/api/member/update',
+                    url: `/api/members/${id}`,
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
@@ -65,7 +67,7 @@
                     },
                     success: function(response) {
                         alert(response);
-                        window.location.href = '/member';
+                        window.location.href = '/member/settings';
                     },
                     error: function(xhr, status, error) {
                         alert(xhr.responseText);

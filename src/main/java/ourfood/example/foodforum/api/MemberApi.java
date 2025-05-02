@@ -35,7 +35,7 @@ public class MemberApi {
     private final PasswordEncoder passwordEncoder;
 
     @Operation(summary = "Member 가입")
-    @PostMapping("/member/new")
+    @PostMapping("/members")
     public ResponseEntity<String> createMember(@RequestBody MemberDTO.Create memberDTO) {
         if (memberService.isDuplicatedName(memberDTO.getMemberName())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 사용중인 아이디 입니다.");
@@ -49,8 +49,8 @@ public class MemberApi {
         }
     }
 
-    @PostMapping("/member/update")
-    public ResponseEntity<String> memberUpdate(@RequestBody MemberDTO.Update memberUpdateDTO) {
+    @PostMapping("/members/{id}")
+    public ResponseEntity<String> memberUpdate(@RequestBody MemberDTO.Update memberUpdateDTO, @PathVariable(value = "id") Long id) {
         try {
             String encodedPassword = passwordEncoder.encode(memberUpdateDTO.getPassword());
             memberService.updateMember(memberUpdateDTO.getMemberId(), memberUpdateDTO.getNickname(), encodedPassword);
@@ -65,9 +65,10 @@ public class MemberApi {
         }
     }
 
-    @PostMapping("/member/delete")
+    @DeleteMapping("/members/{id}")
     public ResponseEntity<String> memberDelete(@AuthenticationPrincipal UserDetails userDetails,
                                                @RequestBody MemberDTO.Delete memberDeleteDTO,
+                                               @PathVariable(value = "id") Long id,
                                                HttpServletRequest request) {
         Member findMember = memberService.findByName(userDetails.getUsername());
         Boolean isPasswordCorrect = memberService.passwordCheck(findMember, memberDeleteDTO.getPassword());

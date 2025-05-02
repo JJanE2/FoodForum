@@ -11,6 +11,8 @@
 </head>
 <body>
 
+<input type="hidden" id="id" th:value="${id}">
+
 <!-- Include the header -->
 <div th:replace="fragments :: header"></div>
 
@@ -43,7 +45,7 @@
     </div>
 
     <div class="d-flex justify-content-center mb-3">
-      <button type="button" class="btn btn-outline-secondary me-2" th:onclick="|location.href='@{/member/update}'|">수정하기</button>
+      <button type="button" class="btn btn-outline-secondary me-2" th:onclick="|location.href='@{/member/settings/update}'|">수정하기</button>
       <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#memberDeleteModal">회원 탈퇴</button>
     </div>
   </div>
@@ -51,7 +53,7 @@
   <div class="container w-75">
     <div class="row gap-3">
       <div class="rounded border shadow my-5 text-start col px-5"
-           th:onclick="|location.href='@{/reviews}'|" style="cursor: pointer;">
+           th:onclick="|location.href='@{/member/reviews}'|" style="cursor: pointer;">
         <h2 class="pt-3" >리뷰 관리</h2>
         <p class="text-muted">작성한 리뷰정보를 수정하세요</p>
       </div>
@@ -104,12 +106,12 @@
         // 탈퇴 버튼 클릭 시
         $('#confirmPassword').on('click', function() {
             const password = document.getElementById('password').value;
+            const id = parseInt($('#id').val(), 10);
 
             // 비밀번호 확인 요청
             $.ajax({
-
-                url: '/api/member/delete',
-                method: 'POST',
+                url: `/api/members/${id}`,
+                method: 'DELETE',
                 contentType: 'application/json',
                 data: JSON.stringify({ password: password }),
                 beforeSend: function (xhr) {

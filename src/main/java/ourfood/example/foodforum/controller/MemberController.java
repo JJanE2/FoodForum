@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import ourfood.example.foodforum.entity.Member;
+import ourfood.example.foodforum.exception.CustomAccessDeniedException;
 import ourfood.example.foodforum.service.MemberService;
 
 @Controller
@@ -30,24 +32,24 @@ public class MemberController {
         return "member/loginForm";
     }
 
-    @GetMapping("/member/new")
+    @GetMapping("/members/new")
     public String memberForm() {
         return "member/memberForm";
     }
 
-    @GetMapping("/member")
+    @GetMapping("/member/settings")
     public String myPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
 
         Member member = memberService.findByName(userDetails.getUsername());
 
         model.addAttribute("nickname", member.getNickname());
-
         String role = member.getRole().name();
         model.addAttribute("role", role);
+        model.addAttribute("id", member.getId());
         return "member/memberDetails";
     }
 
-    @GetMapping("/member/update")
+    @GetMapping("/member/settings/update")
     public String memberUpdateForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         Member findMember = memberService.findByName(userDetails.getUsername());
         String memberName = userDetails.getUsername();

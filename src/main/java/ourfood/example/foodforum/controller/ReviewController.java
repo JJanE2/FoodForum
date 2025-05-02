@@ -22,7 +22,7 @@ public class ReviewController {
     private final RestaurantService restaurantService;
     private final MemberService memberService;
 
-    @GetMapping("/reviews")
+    @GetMapping("/member/reviews")
     public String memberReviewsPage() {
         return "review/reviews";
     }

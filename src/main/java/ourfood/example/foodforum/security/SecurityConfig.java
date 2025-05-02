@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/css/**", "/js/**", "/images/**", "/static/**", "/api/**",
-                                "/", "/login", "/member/new",
+                                "/", "/login", "/members/new",
                                 "/restaurants", "/restaurants/{id}", "/restaurants/search"
                         ).permitAll() // 인증 필요 없는 경로
                         .requestMatchers(
