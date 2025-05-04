@@ -85,7 +85,7 @@
 
                 // AJAX를 통해 서버에 회원가입 요청
                 $.ajax({
-                    url: '/api/review/new',
+                    url: '/api/reviews',
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
@@ -100,7 +100,7 @@
                         window.location.href = '/restaurants/' + formData.restaurantId;
                     },
                     error: function(xhr, status, error) {
-                        alert('회원가입 중 오류가 발생했습니다: ' + xhr.responseText);
+                        alert('리뷰 작성 중 오류가 발생했습니다: ' + xhr.responseText);
                     }
                 });
             });

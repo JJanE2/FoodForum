@@ -28,10 +28,10 @@ public class ReviewController {
     }
 
     //리뷰 작성 form으로 이동
-    @GetMapping("/{restaurantId}/review/new")
-    public String createReview(@PathVariable(value = "restaurantId") Long restaurantId, Model model) {
-        restaurantService.findById(restaurantId);
-        model.addAttribute("restaurantId", restaurantId);
+    @GetMapping("/restaurants/{id}/reviews/new")
+    public String createReview(@PathVariable(value = "id") Long id, Model model) {
+        restaurantService.findById(id);
+        model.addAttribute("restaurantId", id);
         return "review/reviewForm";
     }
 

@@ -43,7 +43,7 @@ public class RestaurantController {
     @GetMapping("/restaurants/{id}")
     public String RestaurantDetail(@PathVariable(value = "id") Long id, Model model) {
         Restaurant findRestaurant = restaurantService.findById(id);
-        model.addAttribute("restaurantId", id);
+        model.addAttribute("id", id);
         return "restaurant/restaurantDetail";
     }
 

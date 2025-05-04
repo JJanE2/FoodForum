@@ -70,7 +70,7 @@
             $('#review-update-form').on('submit', function(event) {
                 event.preventDefault();  // 폼 기본 제출 방지
                 var starRating = $('#starRating').val();
-                const reviewId = $('#reviewId').val();
+                const id = $('#reviewId').val();
 
                 // 폼 데이터 가져오기
                 const formData = {
@@ -79,7 +79,7 @@
                 };
 
                 $.ajax({
-                    url: '/api/reviews/' + reviewId + '/update',
+                    url: '/api/reviews/' + id,
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
@@ -90,11 +90,11 @@
                         // 팝업창 띄우기
                         alert(response);
 
-                        window.location.href = '/reviews';
+                        window.location.href = '/member/reviews';
                     },
                     error: function(xhr, status, error) {
                         alert(xhr.responseText);
-                        window.location.href = '/reviews';
+                        window.location.href = '/member/reviews';
                     }
                 });
             });

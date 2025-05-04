@@ -31,7 +31,7 @@ public class ReviewApi {
     private final RestaurantService restaurantService;
 
     @Operation(summary = "Review 추가")
-    @PostMapping("/review/new")
+    @PostMapping("/reviews")
     public ResponseEntity<String> createReview(@RequestBody ReviewDTO.Create reviewDTO, @AuthenticationPrincipal UserDetails userDetails) {
         Member findMember = memberService.findByName(userDetails.getUsername());
         Restaurant findRestaurant = restaurantService.findById(reviewDTO.getRestaurantId());
@@ -43,14 +43,14 @@ public class ReviewApi {
         return ResponseEntity.ok("리뷰가 성공적으로 작성되었습니다.");
     }
 
-    @PostMapping("/reviews/delete/{id}")
+    @DeleteMapping("/reviews/{id}")
     public ResponseEntity<String> deleteReview(@PathVariable(value = "id") Long id) {
         Review findReview = reviewService.findById(id);
         reviewService.deleteReview(findReview);
         return ResponseEntity.ok("리뷰가 삭제되었습니다.");
     }
 
-    @PostMapping("/reviews/{id}/update")
+    @PostMapping("/reviews/{id}")
     public ResponseEntity<String> updateReview(@PathVariable("id") Long id, @RequestBody ReviewDTO.Update reviewUpdateDTO) {
         Boolean canUpdate = reviewService.canUpdate(reviewService.findById(id));
 
@@ -65,7 +65,7 @@ public class ReviewApi {
     }
 
     @Operation(summary = "Restaurant 의 리뷰 목록 정보")
-    @GetMapping("/restaurant/{id}/reviews")
+    @GetMapping("/restaurants/{id}/reviews")
     public List<ReviewDTO.RestaurantReview> getRestaurantDetail(
             @PathVariable Long id,
             @RequestParam(required = false) Long cursorId,
