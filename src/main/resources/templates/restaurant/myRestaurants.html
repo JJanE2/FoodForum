@@ -116,15 +116,15 @@
 
     // 식당마다 있는 삭제 버튼 클릭 시 리뷰 ID 저장
     $(document).on('click', '.open-modal-btn', function() {
-        restaurantId = $(this).data('restaurant-id');
+        id = $(this).data('restaurant-id');
     });
 
     // 모달 창의 "리뷰 삭제" 버튼 클릭 시 AJAX로 리뷰 삭제 요청
     $('#confirmDelete').click(function() {
         $.ajax({
-            url: "/api/restaurants/" + restaurantId + "/delete",
+            url: "/api/restaurants/" + id,
 
-            method: 'POST',
+            method: 'DELETE',
             beforeSend: function (xhr) {
                 xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
             },

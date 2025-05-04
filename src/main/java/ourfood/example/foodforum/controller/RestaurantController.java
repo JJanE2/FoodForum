@@ -31,9 +31,6 @@ public class RestaurantController {
 
     @GetMapping("/restaurants/new")
     public String createRestaurant(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if ((userDetails == null)) {
-            return "member/loginForm";
-        }
         Member findMember = memberService.findByName(userDetails.getUsername());
         memberService.validMemberRole(findMember);
 

@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 public class RestaurantApi {
 
     private final RestaurantService restaurantService;
-    private final ReviewService reviewService;
     private final MemberService memberService;
 
     @Operation(summary = "모든 Restaurant 조회")
@@ -43,7 +42,7 @@ public class RestaurantApi {
 
     // Restaurant 등록
     @Operation(summary = "Restaurant 추가")
-    @PostMapping("/restaurant/new")
+    @PostMapping("/restaurants")
     public ResponseEntity<String> postRestaurant(@RequestBody RestaurantDTO.Create restaurantCreateDTO,
                                                  @AuthenticationPrincipal UserDetails userDetails) {
         Member findMember = memberService.findByName(userDetails.getUsername());
@@ -74,7 +73,7 @@ public class RestaurantApi {
     }
 
     @Operation(summary = "Restaurant 상세조회 (리뷰 목록은 ReviewControllerApi 에서 처리)")
-    @GetMapping("/restaurant/{id}")
+    @GetMapping("/restaurants/{id}")
     public RestaurantDTO.DetailInfo getRestaurantDetail(@PathVariable(value = "id") Long id) {
 
         Restaurant restaurant = restaurantService.findById(id);
@@ -91,28 +90,28 @@ public class RestaurantApi {
 
     // Restaurant menu 추가후 상세페이지 이동을 위해 restaurantId 반환
     @Operation(summary = "Restaurant 의 Menu 추가")
-    @PostMapping("/restaurant/{id}/menu")
+    @PostMapping("/restaurants/{id}/menus")
     public Long addMenu(@PathVariable(value = "id") Long id, @RequestBody List<Menu> menus) {
         addMenuToRestaurant(id, menus);
         return id;
     }
 
     // restaurant 기본 정보 수정
-    @PostMapping("/restaurants/{id}/update")
+    @PostMapping("/restaurants/{id}")
     public Long updateRestaurantInfo(@PathVariable Long id, @RequestBody RestaurantDTO.UpdateRequest restaurantRequestDTO) {
         return restaurantService.updateRestaurant(id, restaurantRequestDTO.getName(), restaurantRequestDTO.getDescription(), restaurantRequestDTO.getMenus(),
                 restaurantRequestDTO.getAddress(), restaurantRequestDTO.getLatitude(), restaurantRequestDTO.getLongitude());
     }
 
     @Operation(summary = "Restaurant 조건 검색 (이름, 별점)")
-    @GetMapping("/restaurant/condition")
+    @GetMapping("/restaurants/condition")
     public List<RestaurantDTO.BasicInfo> conditionSearch(@RequestParam(required = false) String restaurantName,
                                                          @RequestParam(required = false) Double minimumRating) {
         return restaurantService.conditionSearch(restaurantName, minimumRating);
     }
 
-    @PostMapping("/restaurants/{restaurantId}/delete")
-    public ResponseEntity<String> deleteRestaurant(@PathVariable(value = "restaurantId") Long restaurantId) {
+    @DeleteMapping("/restaurants/{id}")
+    public ResponseEntity<String> deleteRestaurant(@PathVariable(value = "id") Long restaurantId) {
         Restaurant restaurant = restaurantService.findById(restaurantId);
         restaurantService.deleteRestaurant(restaurant);
 

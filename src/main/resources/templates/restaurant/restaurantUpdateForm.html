@@ -125,7 +125,7 @@
     }
 
     $(document).ready(function() {
-        var restaurantId = parseInt($('#restaurantId').val(), 10);
+        var id = parseInt($('#restaurantId').val(), 10);
 
         $('#restaurant-update-form').on('submit', function(event) {
             event.preventDefault(); // 기본 제출 방지
@@ -148,7 +148,7 @@
             });
 
             $.ajax({
-                url: '/api/restaurants/' + restaurantId + '/update',
+                url: '/api/restaurants/' + id,
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(formData),
@@ -157,7 +157,7 @@
                 },
                 success: function(response) {
                     alert('기본정보가 수정되었습니다.');
-                    window.location.href = '/restaurants/' + restaurantId;
+                    window.location.href = '/restaurants/' + id;
                 },
                 error: function(xhr, status, error) {
                     alert('수정 중 오류가 발생했습니다.');
@@ -196,7 +196,7 @@
             });
 
             $.ajax({
-                url: '/api/restaurant/' + restaurantId + '/menu',
+                url: '/api/restaurants/' + id + '/menus',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(formData),
@@ -205,7 +205,7 @@
                 },
                 success: function(response) {
                     alert('메뉴가 정상적으로 추가되었습니다.');
-                    window.location.href = '/restaurants/' + restaurantId;
+                    window.location.href = '/restaurants/' + id;
                 },
                 error: function(xhr, status, error) {
                     alert('메뉴 추가 중 오류가 발생했습니다.');
