@@ -155,20 +155,20 @@
     const csrfToken = $('meta[name="_csrf"]').attr('content');
     const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
 
-    let memberId; // 전역 변수로 선언하여 버튼 클릭 시 저장
+    let id; // 전역 변수로 선언하여 버튼 클릭 시 저장
 
     // 회원마다 있는 삭제 버튼 클릭 시 리뷰 ID 저장
     $(document).on('click', '.open-modal-btn', function() {
-        memberId = $(this).data('member-id');
+        id = $(this).data('member-id');
     });
 
     // 모달 창의 "리뷰 삭제" 버튼 클릭 시 AJAX로 리뷰 삭제 요청
     $('#confirmDelete').click(function() {
         $.ajax({
-            url: "/api/members/delete",
-            method: 'POST',
+            url: `/api/admin/members/${id}`,
+            method: 'DELETE',
             contentType: 'application/json',
-            data: JSON.stringify(memberId),
+            data: JSON.stringify(id),
             beforeSend: function (xhr) {
                 xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
             },
@@ -186,7 +186,7 @@
 
     // 계정 상태 변경 모달 열기
     $(document).on('click', '.status-modal-btn', function() {
-        memberId = $(this).data('member-id');
+        id = $(this).data('member-id');
         $('#memberStatusModal').modal('show'); // 계정 상태 모달 열기
     });
 
@@ -194,9 +194,9 @@
     $('#suspendMember').click(function() {
         $.ajax({
             type: 'POST',
-            url: '/api/members/suspend',
+            url: `/api/admin/members/${id}/suspend`,
             contentType: 'application/json',
-            data: JSON.stringify(memberId),
+            data: JSON.stringify(id),
             beforeSend: function (xhr) {
                 xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
             },
@@ -215,9 +215,9 @@
     $('#activateMember').click(function() {
         $.ajax({
             type: 'POST',
-            url: '/api/members/activate',
+            url: `/api/admin/members/${id}/activate`,
             contentType: 'application/json',
-            data: JSON.stringify(memberId),
+            data: JSON.stringify(id),
             beforeSend: function (xhr) {
                 xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 추가
             },

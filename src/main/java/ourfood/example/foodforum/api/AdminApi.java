@@ -14,7 +14,7 @@ import ourfood.example.foodforum.service.ReviewService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/admin")
 public class AdminApi {
 
     private final MemberService memberService;
@@ -22,11 +22,11 @@ public class AdminApi {
     private final ReviewService reviewService;
     private final AdminService adminService;
 
-    @PostMapping("/members/delete")
-    public ResponseEntity<String> deleteMember(@RequestBody Long memberId) {
+    @DeleteMapping("/members/{id}")
+    public ResponseEntity<String> deleteMember(@PathVariable(value = "id") Long id) {
 
         try {
-            Member member = memberService.findById(memberId);
+            Member member = memberService.findById(id);
             memberService.deleteMember(member);
             return ResponseEntity.ok("회원이 성공적으로 삭제되었습니다.");
         } catch (Exception e) {
@@ -34,32 +34,32 @@ public class AdminApi {
         }
     }
 
-    @PostMapping("/members/suspend")
-    public ResponseEntity<String> suspendMember(@RequestBody Long memberId) {
+    @PostMapping("/members/{id}/suspend")
+    public ResponseEntity<String> suspendMember(@PathVariable(value = "id") Long id) {
 
         try {
-            adminService.suspendMember(memberId);
+            adminService.suspendMember(id);
             return ResponseEntity.ok("계정이 제한되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("계정 제한 중 오류가 발생했습니다.");
         }
     }
 
-    @PostMapping("/members/activate")
-    public ResponseEntity<String> activeMember(@RequestBody Long memberId) {
+    @PostMapping("/members/{id}/activate")
+    public ResponseEntity<String> activeMember(@PathVariable(value = "id") Long id) {
 
         try {
-            adminService.activateMember(memberId);
+            adminService.activateMember(id);
             return ResponseEntity.ok("계정이 활성화되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("계정 활성화 중 오류가 발생했습니다.");
         }
     }
-    @PostMapping("/restaurants/delete")
-    public ResponseEntity<String> deleteRestaurant(@RequestBody Long restaurantId) {
+    @DeleteMapping("/restaurants/{id}")
+    public ResponseEntity<String> deleteRestaurant(@PathVariable(value = "id") Long id) {
 
         try {
-            Restaurant restaurant = restaurantService.findById(restaurantId);
+            Restaurant restaurant = restaurantService.findById(id);
             restaurantService.deleteRestaurant(restaurant);
             return ResponseEntity.ok("식당이 성공적으로 삭제되었습니다.");
         } catch (Exception e) {
@@ -67,11 +67,11 @@ public class AdminApi {
         }
     }
 
-    @PostMapping("/reviews/delete")
-    public ResponseEntity<String> deleteReview(@RequestBody Long reviewId) {
+    @DeleteMapping("/reviews/{id}")
+    public ResponseEntity<String> deleteReview(@PathVariable(value = "id") Long id) {
 
         try {
-            Review review = reviewService.findById(reviewId);
+            Review review = reviewService.findById(id);
             reviewService.deleteReview(review);
             return ResponseEntity.ok("리뷰가 성공적으로 삭제되었습니다.");
         } catch (Exception e) {
