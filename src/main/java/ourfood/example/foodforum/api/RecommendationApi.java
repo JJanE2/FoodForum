@@ -31,7 +31,7 @@ public class RecommendationApi {
     private final MemberService memberService;
 
 
-    @PostMapping("/recommendation/new")
+    @PostMapping("/recommendations")
     public ResponseEntity<Map<String, Object>> toggleRecommendation(@AuthenticationPrincipal UserDetails userDetails,
                                                     @RequestBody RecommendationDTO.Create recommendationDTO) {
 

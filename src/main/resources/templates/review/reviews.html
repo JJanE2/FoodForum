@@ -163,7 +163,7 @@
             const reviewId = $(this).data('review-id');
 
             $.ajax({
-                url: '/api/recommendation/new',
+                url: '/api/recommendations',
                 type: 'POST',
                 contentType: 'application/json',
                 beforeSend: function (xhr) {
